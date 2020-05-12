@@ -18,10 +18,19 @@ export class Root extends Component {
         <Route exact path="/~bartinfo" render={ () => {
           return (
             <div className="cf w-100 flex flex-column pa4 ba-m ba-l ba-xl b--gray2 br1 h-100 h-100-minus-40-s h-100-minus-40-m h-100-minus-40-l h-100-minus-40-xl f9 white-d overflow-x-hidden">
-              <h1 className="mt0 f8 fw4">bartinfo</h1>
-              <p className="lh-copy measure pt3">Welcome to your Landscape application.</p>
-              <p className="lh-copy measure pt3">To get started, edit <code>src/index.js</code>, <code>tile/tile.js</code> or <code>urbit/app/bartinfo.hoon</code> and <code>|commit %home</code> on your Urbit ship to see your changes.</p>
-              <a className="black no-underline db f8 pt3" href="https://urbit.org/docs">-> Read the docs</a>
+              <h1 className="mt0 f8 fw4">BART Info</h1>
+              <div style={{display: "grid", gridTemplateColumns: "66% 34%", gridGap: "10px" }}>
+                <div className="topinfo" style={{gridColumn: "1 / 2"}}>
+                  <p className="lh-copy measure pt3">Current time is (current time)</p>
+                  <p className="lh-copy measure pt3">Today's bart map:</p>
+                </div>
+                <div className="map" style={{gridColumn: "1", gridRow: "2"}}>
+                  <img src="/~bartinfo/img/BART-Map-Weekday-Saturday.png" />
+                </div>
+                <div className="searchsidebar" style={{gridColumn: "2", gridRow: "2"}}>
+                  Search stuff here
+                </div>
+              </div>
             </div>
           )}}
         />
