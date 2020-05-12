@@ -7,6 +7,8 @@ import { HeaderBar } from "./lib/header-bar.js"
 export class Root extends Component {
   constructor(props) {
     super(props);
+
+    this.state = { fromValue: "ashby", toValue: "24th" };
   }
 
   render() {
@@ -28,7 +30,21 @@ export class Root extends Component {
                   <img src="/~bartinfo/img/BART-Map-Weekday-Saturday.png" />
                 </div>
                 <div className="searchsidebar" style={{gridColumn: "2", gridRow: "2"}}>
-                  Search stuff here
+                  Search scheduled trains:
+                  <form name="bartSearch">
+                    From:
+                    <select value={this.state.fromValue}>
+                        <option value="ashby">Ashby</option>
+                        <option value="fremont">Fremont</option>
+                    </select>
+                    <br/>
+                    To:
+                    <select value={this.state.toValue}>
+                        <option value="ashby">Ashby</option>
+                        <option value="fremont">Fremont</option>
+                        <option value="24th">24th st</option>
+                    </select>
+                  </form>
                 </div>
               </div>
             </div>
