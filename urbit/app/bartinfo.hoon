@@ -93,6 +93,9 @@
 ::
 :: request to http://api.bart.gov/api/stn.aspx?cmd=stns&key=Q5RQ-PUEB-999T-DWEI&json=y
 :: get .root | .stations | .station for list of stations
+
+++  bart-api-key  "Q5RQ-PUEB-999T-DWEI"
+++  bart-api-url-base  "http://api.bart.gov/api"
 ++  poke-handle-http-request
   |=  =inbound-request:eyre
   ^-  simple-payload:http
@@ -116,7 +119,20 @@
   |=  ~
   ^-   json
   %-  pairs:enjs:format
-  :~  success+b+%.n
+  :~
+    success+b+%.n
   ==
+++  request-bart-stations
+  ^-  request:http
+  =/  url  (crip "{bart-api-url-base}/stn.aspx?cmd=stns&key={bart-api-key}&json=y")
+  =/  headers  [['Accept' 'application/json']]~
+  [%'GET' url headers *(unit octs)]
+::;++  request-darksky
+::  |=  location=@t
+::  ^-  request:http
+::  =/  base  'https://api.darksky.net/forecast/634639c10670c7376dc66b6692fe57ca/'
+::  =/  url=@t  (cat 3 (cat 3 base location) '?units=auto')
+::  =/  hed  [['Accept' 'application/json']]~
+::  [%'GET' url hed *(unit octs)]
 ::
 --
