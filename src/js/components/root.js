@@ -11,6 +11,10 @@ export class Root extends Component {
     this.state = { fromValue: "ashby", toValue: "24th" };
   }
 
+  action() {
+    console.log("Clickin'");
+  }
+
   render() {
 
     return (
@@ -45,6 +49,7 @@ export class Root extends Component {
                         <option value="24th">24th st</option>
                     </select>
                   </form>
+                  <button onClick={this.action.bind(this)}>Search</button>
                 </div>
               </div>
             </div>

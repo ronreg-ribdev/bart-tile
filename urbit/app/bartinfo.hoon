@@ -91,6 +91,8 @@
 ::
 |_  bol=bowl:gall
 ::
+:: request to http://api.bart.gov/api/stn.aspx?cmd=stns&key=Q5RQ-PUEB-999T-DWEI&json=y
+:: get .root | .stations | .station for list of stations
 ++  poke-handle-http-request
   |=  =inbound-request:eyre
   ^-  simple-payload:http
@@ -98,6 +100,7 @@
   ?+  site.url  not-found:gen
       [%'~bartinfo' %css %index ~]  (css-response:gen style)
       [%'~bartinfo' %js %tile ~]    (js-response:gen tile-js)
+      [%'~bartinfo' %js %tileman ~]    (js-response:gen tile-js)
       [%'~bartinfo' %js %index ~]   (js-response:gen script)
   ::
       [%'~bartinfo' %img @t *]
