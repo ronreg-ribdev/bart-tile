@@ -100,8 +100,8 @@
   ?+  site.url  not-found:gen
       [%'~bartinfo' %css %index ~]  (css-response:gen style)
       [%'~bartinfo' %js %tile ~]    (js-response:gen tile-js)
-      [%'~bartinfo' %js %tileman ~]    (js-response:gen tile-js)
       [%'~bartinfo' %js %index ~]   (js-response:gen script)
+      [%'~bartinfo' %js %bogus ~]   (js-response:gen (json-to-octs (bogus-json)))
   ::
       [%'~bartinfo' %img @t *]
     =/  name=@t  i.t.t.site.url
@@ -111,6 +111,12 @@
     (png-response:gen (as-octs:mimes:html u.img))
   ::
       [%'~bartinfo' *]  (html-response:gen index)
+  ==
+  ++  bogus-json
+  |=  ~
+  ^-   json
+  %-  pairs:enjs:format
+  :~  success+b+%.n
   ==
 ::
 --
