@@ -9,6 +9,7 @@ class UrbitApi {
   }
 
   bind(path, method, ship = this.authTokens.ship, appl = "bartinfo", success, fail) {
+    console.log(`Calling api.bind() with path ${path} ship ${ship} method ${method}`);
     this.bindPaths = _.uniq([...this.bindPaths, path]);
 
     window.subscriptionId = window.urb.subscribe(ship, appl, path, 

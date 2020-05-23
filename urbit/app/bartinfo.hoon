@@ -54,6 +54,14 @@
     ^-  (quip card _this)
     ?>  (team:title our.bol src.bol)
     ?+    mark  (on-poke:def mark vase)
+        %noun
+          ?+   q.vase  (on-poke:def mark vase)
+          %print-chutney   ~&  "CHUTNEY"  [~ this]
+          %print-state   ~&  this  [~ this]
+          %give-number  [[%give %fact ~[/primary] %json !>(*json)]~ this]
+          ::%yolo  [[%give %fact ~ %noun [@ 299]]~ this]
+          ::%hella   [[%give %fact ~ %json !>((bogus-json:cc))]~ this]
+          ==
         %handle-http-request
       =+  !<([eyre-id=@ta =inbound-request:eyre] vase)
       :_  this
@@ -66,6 +74,10 @@
   ++  on-watch
     |=  =path
     ^-  (quip card:agent:gall _this)
+    ~&  "on-watch path: {<path>}"
+    ?:  ?=([%primary *] path)
+      :_  this
+      [%give %fact ~ %json !>((bogus-json:cc))]~
     ?:  ?=([%http-response *] path)
       `this
     ?.  =(/ path)
@@ -120,7 +132,7 @@
   ^-   json
   %-  pairs:enjs:format
   :~
-    success+b+%.n
+    success+b+%.y
   ==
 ++  request-bart-stations
   ^-  request:http
