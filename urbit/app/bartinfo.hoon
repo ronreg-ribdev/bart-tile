@@ -76,8 +76,12 @@
     ^-  (quip card:agent:gall _this)
     ~&  "on-watch path: {<path>}"
     ?:  ?=([%primary *] path)
-      :_  this
-      [%give %fact ~ %json !>((bogus-json:cc))]~
+      =/  initial-resp   [%give %fact ~ %json !>((bogus-json:cc))]
+      =/  out  *outbound-config:iris
+      =/  req  request-bart-stations:cc
+      ::=/  bart-station-request   [%pass /[(scot %da now.bol)] %arvo %i %request req out]
+      =/  bart-station-request   [%pass /bartstationrequest %arvo %i %request req out]
+      [[initial-resp bart-station-request ~] this]
     ?:  ?=([%http-response *] path)
       `this
     ?.  =(/ path)
@@ -89,6 +93,13 @@
   ++  on-arvo
     |=  [=wire =sign-arvo]
     ^-  (quip card _this)
+    ?:  ?=(%http-response +<.sign-arvo)
+      ~&  "WIRE: {<wire>}"
+      ::~&  "SIGN ARVO: {<sign-arvo>}"
+      =/  value  %-  pairs:enjs:format
+                :~  fulltext+s+(crip "{<sign-arvo>}")
+                ==
+      [[%give %fact ~[/primary] %json !>(value)]~ this]
     ?.  ?=(%bound +<.sign-arvo)
       (on-arvo:def wire sign-arvo)
     [~ this]
