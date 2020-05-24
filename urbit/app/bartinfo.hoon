@@ -74,12 +74,11 @@
     ^-  (quip card _this)
     ~&  "on-watch path: {<path>}"
     ?:  ?=([%primary *] path)
-      =/  initial-resp   [%give %fact ~ %json !>((bogus-json:cc))]
       =/  bart-station-request
         =/  out  *outbound-config:iris
         =/  req  bart-api-request-stations:cc
         [%pass /bartstationrequest %arvo %i %request req out]
-      [~[initial-resp bart-station-request] this]
+      [~[bart-station-request] this]
     ?:  ?=([%http-response *] path)
       `this
     ?.  =(/ path)
@@ -145,7 +144,6 @@
       [%'~bartinfo' %css %index ~]  (css-response:gen style)
       [%'~bartinfo' %js %tile ~]    (js-response:gen tile-js)
       [%'~bartinfo' %js %index ~]   (js-response:gen script)
-      [%'~bartinfo' %js %bogus ~]   (js-response:gen (json-to-octs (bogus-json)))
   ::
       [%'~bartinfo' %img @t *]
     =/  name=@t  i.t.t.site.url
@@ -155,12 +153,5 @@
     (png-response:gen (as-octs:mimes:html u.img))
   ::
       [%'~bartinfo' *]  (html-response:gen index)
-  ==
-  ++  bogus-json
-  |=  ~
-  ^-   json
-  %-  pairs:enjs:format
-  :~
-    success+b+%.y
   ==
 --
