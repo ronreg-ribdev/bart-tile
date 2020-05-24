@@ -59,8 +59,6 @@
           %print-chutney   ~&  "CHUTNEY"  [~ this]
           %print-state   ~&  this  [~ this]
           %give-number  [[%give %fact ~[/primary] %json !>(*json)]~ this]
-          ::%yolo  [[%give %fact ~ %noun [@ 299]]~ this]
-          ::%hella   [[%give %fact ~ %json !>((bogus-json:cc))]~ this]
           ==
         %handle-http-request
       =+  !<([eyre-id=@ta =inbound-request:eyre] vase)
@@ -73,15 +71,15 @@
   ::
   ++  on-watch
     |=  =path
-    ^-  (quip card:agent:gall _this)
+    ^-  (quip card _this)
     ~&  "on-watch path: {<path>}"
     ?:  ?=([%primary *] path)
       =/  initial-resp   [%give %fact ~ %json !>((bogus-json:cc))]
-      =/  out  *outbound-config:iris
-      =/  req  request-bart-stations:cc
-      ::=/  bart-station-request   [%pass /[(scot %da now.bol)] %arvo %i %request req out]
-      =/  bart-station-request   [%pass /bartstationrequest %arvo %i %request req out]
-      [[initial-resp bart-station-request ~] this]
+      =/  bart-station-request
+        =/  out  *outbound-config:iris
+        =/  req  bart-api-request-stations:cc
+        [%pass /bartstationrequest %arvo %i %request req out]
+      [~[initial-resp bart-station-request] this]
     ?:  ?=([%http-response *] path)
       `this
     ?.  =(/ path)
@@ -93,13 +91,14 @@
   ++  on-arvo
     |=  [=wire =sign-arvo]
     ^-  (quip card _this)
+    ~&  "on-arvo wire: {<wire>}"
     ?:  ?=(%http-response +<.sign-arvo)
-      ~&  "WIRE: {<wire>}"
-      ::~&  "SIGN ARVO: {<sign-arvo>}"
-      =/  value  %-  pairs:enjs:format
-                :~  fulltext+s+(crip "{<sign-arvo>}")
-                ==
-      [[%give %fact ~[/primary] %json !>(value)]~ this]
+      =/  http-moves=(list card)
+        =/  value  %-  pairs:enjs:format
+                   :~  fulltext+s+(crip "{<sign-arvo>}")
+                   ==
+        [%give %fact ~[/primary] %json !>(value)]~
+      [http-moves this]
     ?.  ?=(%bound +<.sign-arvo)
       (on-arvo:def wire sign-arvo)
     [~ this]
@@ -116,9 +115,14 @@
 ::
 :: request to http://api.bart.gov/api/stn.aspx?cmd=stns&key=Q5RQ-PUEB-999T-DWEI&json=y
 :: get .root | .stations | .station for list of stations
-
 ++  bart-api-key  "Q5RQ-PUEB-999T-DWEI"
 ++  bart-api-url-base  "http://api.bart.gov/api"
+++  bart-api-request-stations
+  ^-  request:http
+  =/  url  (crip "{bart-api-url-base}/stn.aspx?cmd=stns&key={bart-api-key}&json=y")
+  =/  headers  [['Accept' 'application/json']]~
+  [%'GET' url headers *(unit octs)]
+::
 ++  poke-handle-http-request
   |=  =inbound-request:eyre
   ^-  simple-payload:http
@@ -145,17 +149,4 @@
   :~
     success+b+%.y
   ==
-++  request-bart-stations
-  ^-  request:http
-  =/  url  (crip "{bart-api-url-base}/stn.aspx?cmd=stns&key={bart-api-key}&json=y")
-  =/  headers  [['Accept' 'application/json']]~
-  [%'GET' url headers *(unit octs)]
-::;++  request-darksky
-::  |=  location=@t
-::  ^-  request:http
-::  =/  base  'https://api.darksky.net/forecast/634639c10670c7376dc66b6692fe57ca/'
-::  =/  url=@t  (cat 3 (cat 3 base location) '?units=auto')
-::  =/  hed  [['Accept' 'application/json']]~
-::  [%'GET' url hed *(unit octs)]
-::
 --
