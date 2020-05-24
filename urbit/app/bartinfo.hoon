@@ -94,10 +94,11 @@
     ~&  "on-arvo wire: {<wire>}"
     ?:  ?=(%http-response +<.sign-arvo)
       =/  http-moves=(list card)
-        =/  value  %-  pairs:enjs:format
-                   :~  fulltext+s+(crip "{<sign-arvo>}")
-                   ==
+      ?+  wire   ~
+        [%bartstationrequest *]
+        =/  value=json  (parse-request-stations-response:cc client-response.sign-arvo)
         [%give %fact ~[/primary] %json !>(value)]~
+      ==
       [http-moves this]
     ?.  ?=(%bound +<.sign-arvo)
       (on-arvo:def wire sign-arvo)
@@ -122,6 +123,19 @@
   =/  url  (crip "{bart-api-url-base}/stn.aspx?cmd=stns&key={bart-api-key}&json=y")
   =/  headers  [['Accept' 'application/json']]~
   [%'GET' url headers *(unit octs)]
+::
+++  parse-request-stations-response
+  |=  response=client-response:iris
+  ^-  json
+  =/  pairs  pairs:enjs:format
+  ?.  ?=(%finished -.response)
+    %-  pairs  [fulltext+s+'bart response error' ~]
+  =/  data=(unit mime-data:iris)  full-file.response
+  ?~  data  %-  pairs  ~
+  =/  ujon=(unit json)  (de-json:html q.data.u.data)
+  ?~  ujon   %-  pairs  ~
+  =/  parsed-json   u.ujon
+  parsed-json
 ::
 ++  poke-handle-http-request
   |=  =inbound-request:eyre
