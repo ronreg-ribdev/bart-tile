@@ -126,15 +126,31 @@
 ++  parse-request-stations-response
   |=  response=client-response:iris
   ^-  json
-  =/  pairs  pairs:enjs:format
+  =,  format
   ?.  ?=(%finished -.response)
-    %-  pairs  [fulltext+s+'bart response error' ~]
+    %-  pairs:enjs  [fulltext+s+'bart response error' ~]
   =/  data=(unit mime-data:iris)  full-file.response
-  ?~  data  %-  pairs  ~
+  ?~  data  %-  pairs:enjs  ~
   =/  ujon=(unit json)  (de-json:html q.data.u.data)
-  ?~  ujon   %-  pairs  ~
+  ?~  ujon   %-  pairs:enjs  ~
+  ?>  ?=(%o -.u.ujon)
   =/  parsed-json   u.ujon
-  parsed-json
+  =/  root=json  (~(got by p.parsed-json) 'root')
+  ?>  ?=(%o -.root)
+  =/  stations  (~(got by p.root) 'stations')
+  ?>  ?=(%o -.stations)
+  =/  station=json  (~(got by p.stations) 'station')
+  ?>  ?=(%a -.station)
+  =/  inner  p.station
+  =/  abbr-and-name   %-  turn  :-  inner  |=  item=json
+    ^-  json
+    ?>  ?=(%o -.item)
+    =/  name  (~(got by p.item) 'name')
+    ?>  ?=(%s -.name)
+    =/  abbr  (~(got by p.item) 'abbr')
+    ?>  ?=(%s -.abbr)
+    (pairs:enjs [name+s+p.name abbr+s+p.abbr ~])
+  a+abbr-and-name
 ::
 ++  poke-handle-http-request
   |=  =inbound-request:eyre
