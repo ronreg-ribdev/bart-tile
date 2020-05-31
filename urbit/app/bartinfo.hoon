@@ -73,7 +73,7 @@
     |=  =path
     ^-  (quip card _this)
     ~&  "on-watch path: {<path>}"
-    ?:  ?=([%primary *] path)
+    ?:  ?=([%bartstations *] path)
       =/  bart-station-request
         =/  out  *outbound-config:iris
         =/  req  bart-api-request-stations:cc
@@ -96,7 +96,9 @@
       ?+  wire   ~
         [%bartstationrequest *]
         =/  value=json  (parse-request-stations-response:cc client-response.sign-arvo)
-        [%give %fact ~[/primary] %json !>(value)]~
+        ?>  ?=(%o -.value)
+        =/  update=json  (pairs:enjs:format [update+o+p.value ~])
+        [%give %fact ~[/bartstations] %json !>(update)]~
       ==
       [http-moves this]
     ?.  ?=(%bound +<.sign-arvo)

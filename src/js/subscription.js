@@ -14,9 +14,16 @@ export class Subscription {
   }
 
    initializebartinfo() {
+    /*
      api.bind('/primary', 'PUT', api.authTokens.ship, 'bartinfo',
        this.handleEvent.bind(this),
        this.handleError.bind(this));
+    */
+
+     api.bind('/bartstations', 'PUT', api.authTokens.ship, 'bartinfo',
+       this.handleEvent.bind(this),
+       this.handleError.bind(this));
+
    }
 
   handleEvent(diff) {

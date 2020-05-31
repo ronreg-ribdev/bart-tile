@@ -1,33 +1,25 @@
-import { InitialReducer } from '/reducers/initial';
-import { ConfigReducer } from '/reducers/config';
 import { UpdateReducer } from '/reducers/update';
 
 
 class Store {
     constructor() {
-        this.state = {
-            inbox: {}
-        };
+        this.state = {}
 
-        this.initialReducer = new InitialReducer();
-        this.configReducer = new ConfigReducer();
         this.updateReducer = new UpdateReducer();
         this.setState = () => { };
     }
 
     setStateHandler(setState) {
+        console.log("Calling setStateHandler");
         this.setState = setState;
     }
 
     handleEvent(data) {
+        console.log("Handling event");
+        console.log(data);
         let json = data.data;
 
-        console.log("Storing event");
-        console.log(json);
-        this.initialReducer.reduce(json, this.state);
-        this.configReducer.reduce(json, this.state);
         this.updateReducer.reduce(json, this.state);
-
         this.setState(this.state);
     }
 }

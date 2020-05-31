@@ -7,16 +7,40 @@ import { HeaderBar } from "./lib/header-bar.js"
 export class Root extends Component {
   constructor(props) {
     super(props);
-
-    this.state = { fromValue: "ashby", toValue: "24th" };
+    this.state = store.state;
+    store.setStateHandler((newState) => {
+        this.setState(newState);
+    });
   }
 
   action() {
     console.log("Clickin'");
   }
 
-  render() {
+  renderStationOptions() {
+    const stations = this.state.stations || [];
+    return _.map(stations, (station) => {
+      const abbr = station.abbr;
+      const name = station.name;
+      return <option key={abbr} value={abbr}>{name}</option>;
+    });
+  }
 
+  renderStationForm() {
+    return (<form name="bartSearch">
+      From:
+      <select value={this.state.fromValue || ""}>
+        { this.renderStationOptions() }
+      </select>
+      <br/>
+      To:
+      <select value={this.state.toValue || ""}>
+        { this.renderStationOptions() }
+      </select>
+    </form>);
+  }
+
+  render() {
     return (
       <BrowserRouter>
         <div className="absolute h-100 w-100 bg-gray0-d ph4-m ph4-l ph4-xl pb4-m pb4-l pb4-xl">
@@ -35,19 +59,9 @@ export class Root extends Component {
                 </div>
                 <div className="searchsidebar" style={{gridColumn: "2", gridRow: "2"}}>
                   Search scheduled trains:
+                  { this.renderStationForm() }
                   <form name="bartSearch">
                     From:
-                    <select value={this.state.fromValue}>
-                        <option value="ashby">Ashby</option>
-                        <option value="fremont">Fremont</option>
-                    </select>
-                    <br/>
-                    To:
-                    <select value={this.state.toValue}>
-                        <option value="ashby">Ashby</option>
-                        <option value="fremont">Fremont</option>
-                        <option value="24th">24th st</option>
-                    </select>
                   </form>
                   <button onClick={this.action.bind(this)}>Search</button>
                 </div>
