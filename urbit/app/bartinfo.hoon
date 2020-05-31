@@ -90,7 +90,7 @@
   ++  on-arvo
     |=  [=wire =sign-arvo]
     ^-  (quip card _this)
-    ~&  "on-arvo wire: {<wire>}"
+    ~&  "The on-arvo wire: {<wire>}"
     ?:  ?=(%http-response +<.sign-arvo)
       =/  http-moves=(list card)
       ?+  wire   ~
@@ -150,7 +150,7 @@
     =/  abbr  (~(got by p.item) 'abbr')
     ?>  ?=(%s -.abbr)
     (pairs:enjs [name+s+p.name abbr+s+p.abbr ~])
-  a+abbr-and-name
+  (pairs:enjs [[%stations %a abbr-and-name] ~])
 ::
 ++  poke-handle-http-request
   |=  =inbound-request:eyre
