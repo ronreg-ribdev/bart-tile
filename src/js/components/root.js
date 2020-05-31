@@ -13,8 +13,18 @@ export class Root extends Component {
     });
   }
 
-  action() {
-    console.log("Clickin'");
+  stationSearch() {
+    console.log("Searching");
+  }
+
+  changeStation(evt) {
+    const target = evt.target.name;
+    const value = evt.target.value;
+    if (target === "fromStation") {
+      this.setState({fromStation: value});
+    } else if (target === "toStation") {
+      this.setState({toStation: value});
+    }
   }
 
   renderStationOptions() {
@@ -27,16 +37,17 @@ export class Root extends Component {
   }
 
   renderStationForm() {
-    return (<form name="bartSearch">
+    return (<form name="bartSearch" onSubmit={this.stationSearch.bind(this)}>
       From:
-      <select value={this.state.fromValue || ""}>
+      <select name="fromStation" value={this.state.fromStation || ""} onChange={this.changeStation.bind(this)}>
         { this.renderStationOptions() }
       </select>
       <br/>
       To:
-      <select value={this.state.toValue || ""}>
+      <select name="toStation" value={this.state.toStation || ""} onChange={this.changeStation.bind(this)}>
         { this.renderStationOptions() }
       </select>
+      <input type="submit" value="Search"/>
     </form>);
   }
 
@@ -60,10 +71,6 @@ export class Root extends Component {
                 <div className="searchsidebar" style={{gridColumn: "2", gridRow: "2"}}>
                   Search scheduled trains:
                   { this.renderStationForm() }
-                  <form name="bartSearch">
-                    From:
-                  </form>
-                  <button onClick={this.action.bind(this)}>Search</button>
                 </div>
               </div>
             </div>
