@@ -131,6 +131,19 @@
 :: get .root | .stations | .station for list of stations
 ++  bart-api-key  "Q5RQ-PUEB-999T-DWEI"
 ++  bart-api-url-base  "http://api.bart.gov/api"
+++  with-json-handler
+  |=  [response=client-response:iris jsonhandler=$-(json json)]
+  ^-  json
+  =,  format
+  ?.  ?=(%finished -.response)
+    %-  pairs:enjs  [fulltext+s+'bart response error' ~]
+  =/  data=(unit mime-data:iris)  full-file.response
+  ?~  data  %-  pairs:enjs  ~
+  =/  ujon=(unit json)  (de-json:html q.data.u.data)
+  ?~  ujon   %-  pairs:enjs  ~
+  ?>  ?=(%o -.u.ujon)
+  =/  parsed-json=json   u.ujon
+  (jsonhandler parsed-json)
 ++  bart-api-request-stations
   ^-  request:http
   =/  url  (crip "{bart-api-url-base}/stn.aspx?cmd=stns&key={bart-api-key}&json=y")
@@ -141,30 +154,25 @@
   |=  response=client-response:iris
   ^-  json
   =,  format
-  ?.  ?=(%finished -.response)
-    %-  pairs:enjs  [fulltext+s+'bart response error' ~]
-  =/  data=(unit mime-data:iris)  full-file.response
-  ?~  data  %-  pairs:enjs  ~
-  =/  ujon=(unit json)  (de-json:html q.data.u.data)
-  ?~  ujon   %-  pairs:enjs  ~
-  ?>  ?=(%o -.u.ujon)
-  =/  parsed-json   u.ujon
-  =/  root=json  (~(got by p.parsed-json) 'root')
-  ?>  ?=(%o -.root)
-  =/  stations  (~(got by p.root) 'stations')
-  ?>  ?=(%o -.stations)
-  =/  station=json  (~(got by p.stations) 'station')
-  ?>  ?=(%a -.station)
-  =/  inner  p.station
-  =/  abbr-and-name   %-  turn  :-  inner  |=  item=json
-    ^-  json
-    ?>  ?=(%o -.item)
-    =/  name  (~(got by p.item) 'name')
-    ?>  ?=(%s -.name)
-    =/  abbr  (~(got by p.item) 'abbr')
-    ?>  ?=(%s -.abbr)
-    (pairs:enjs [name+s+p.name abbr+s+p.abbr ~])
-  (pairs:enjs [[%stations %a abbr-and-name] ~])
+  =/  handler  |=  parsed-json=json
+    ?>  ?=(%o -.parsed-json)
+    =/  root=json  (~(got by p.parsed-json) 'root')
+    ?>  ?=(%o -.root)
+    =/  stations  (~(got by p.root) 'stations')
+    ?>  ?=(%o -.stations)
+    =/  station=json  (~(got by p.stations) 'station')
+    ?>  ?=(%a -.station)
+    =/  inner  p.station
+    =/  abbr-and-name   %-  turn  :-  inner  |=  item=json
+      ^-  json
+      ?>  ?=(%o -.item)
+      =/  name  (~(got by p.item) 'name')
+      ?>  ?=(%s -.name)
+      =/  abbr  (~(got by p.item) 'abbr')
+      ?>  ?=(%s -.abbr)
+      (pairs:enjs [name+s+p.name abbr+s+p.abbr ~])
+    (pairs:enjs [[%stations %a abbr-and-name] ~])
+  (with-json-handler response handler)
 ::
 ++  bart-api-elevator-status
   ^-  request:http
