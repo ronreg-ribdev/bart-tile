@@ -9,6 +9,11 @@ export class UpdateReducer {
             if (stations) {
                 state.stations = stations;
             }
+
+            const elevators = _.get(data, "elevators", false);
+            if (elevators) {
+                state.elevators = elevators;
+            }
         }
     }
 }
