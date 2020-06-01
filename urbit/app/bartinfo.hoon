@@ -168,13 +168,14 @@
 ::
 ++  bart-api-elevator-status
   ^-  request:http
-  =/  url  (crip "{bart-api-url-base}/stn.aspx?cmd=stns&key={bart-api-key}&json=y")
+  =/  url  (crip "{bart-api-url-base}/bsa.aspx?cmd=elev&key={bart-api-key}&json=y")
   =/  headers  [['Accept' 'application/json']]~
   [%'GET' url headers *(unit octs)]
 ++  parse-elevator-status-response
   |=  response=client-response:iris
   ^-  json
   =,  format
+  ~&  response
   (pairs:enjs [[%yolo %b %.y] ~])
 ::
 ++  poke-handle-http-request
