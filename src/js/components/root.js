@@ -3,6 +3,15 @@ import { BrowserRouter, Route, Link } from "react-router-dom";
 import _ from 'lodash';
 import { HeaderBar } from "./lib/header-bar.js"
 
+function isSundaySchedule(curTime) {
+  // Deliberately switch over the effective day in the middle of the
+  // night.
+  const dayOfWeek = curTime.getDay();
+  const hour = curTime.getHours();
+  const isSunday = (dayOfWeek === 0 && hour > 4) || (dayOfWeek === 1 && hour < 4);
+  return isSunday;
+}
+
 class ElevatorWidget extends Component {
 
   statuses() {
@@ -48,7 +57,7 @@ class TimeScheduleWidget extends Component {
   render() {
     const curTime = this.state.curTime;
     const timeStr = curTime.toLocaleTimeString();
-    const serviceStr = curTime.getDay() === 0 ? "Sunday service" : "Weekday / Saturday service";
+    const serviceStr = isSundaySchedule(curTime) ? "Sunday service" : "Weekday / Saturday service";
     return (<div style={{textAlign: "center"}}>
       <p className="lh-copy measure pt3">Current time: <b>{timeStr}</b></p>
       <p className="lh-copy measure pt3">{serviceStr}</p>
@@ -104,6 +113,10 @@ class RoutePlanner extends Component {
   }
 
   render() {
+    const curTime = this.props.curTime;
+    const mapFilename = isSundaySchedule(curTime) ? "BART-Map-Sunday.png" : "BART-Map-Weekday-Saturday.png";
+    const mapPath=`/~bartinfo/img/${mapFilename}`;
+
     return (
       <div className="cf w-100 flex flex-column pa4 ba-m ba-l ba-xl b--gray2 br1 h-100 h-100-minus-40-s h-100-minus-40-m h-100-minus-40-l h-100-minus-40-xl f9 white-d overflow-x-hidden">
         <h1 className="mt0 f8 fw4">BART Info</h1>
@@ -113,7 +126,7 @@ class RoutePlanner extends Component {
             <TimeScheduleWidget/>
           </div>
           <div className="map" style={{gridColumn: "1", gridRow: "2"}}>
-            <img src="/~bartinfo/img/BART-Map-Weekday-Saturday.png" />
+            <img src={mapPath} />
           </div>
           <div className="searchsidebar" style={{gridColumn: "2", gridRow: "2"}}>
             Search scheduled trains:
@@ -146,6 +159,7 @@ export class Root extends Component {
             /> }/>
           <Route exact path="/~bartinfo" render={ () =>
             <RoutePlanner
+              curTime={new Date() }
               stations={this.state.stations || []}
             /> } />
         </div>
