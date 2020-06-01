@@ -79,6 +79,12 @@
         =/  req  bart-api-request-stations:cc
         [%pass /bartstationrequest %arvo %i %request req out]
       [~[bart-station-request] this]
+    ?:  ?=([%elevators *] path)
+      =/  elevator-status-request
+        =/  out  *outbound-config:iris
+        =/  req  bart-api-elevator-status:cc
+        [%pass /elevators %arvo %i %request req out]
+      [~[elevator-status-request] this]
     ?:  ?=([%http-response *] path)
       `this
     ?.  =(/ path)
@@ -99,6 +105,12 @@
         ?>  ?=(%o -.value)
         =/  update=json  (pairs:enjs:format [update+o+p.value ~])
         [%give %fact ~[/bartstations] %json !>(update)]~
+::
+      [%elevators *]
+      =/  value=json  (parse-elevator-status-response:cc client-response.sign-arvo)
+      ?>  ?=(%o -.value)
+      =/  update=json  (pairs:enjs:format [update+o+p.value ~])
+      [%give %fact ~[/elevators] %json !>(update)]~
       ==
       [http-moves this]
     ?.  ?=(%bound +<.sign-arvo)
@@ -153,6 +165,17 @@
     ?>  ?=(%s -.abbr)
     (pairs:enjs [name+s+p.name abbr+s+p.abbr ~])
   (pairs:enjs [[%stations %a abbr-and-name] ~])
+::
+++  bart-api-elevator-status
+  ^-  request:http
+  =/  url  (crip "{bart-api-url-base}/stn.aspx?cmd=stns&key={bart-api-key}&json=y")
+  =/  headers  [['Accept' 'application/json']]~
+  [%'GET' url headers *(unit octs)]
+++  parse-elevator-status-response
+  |=  response=client-response:iris
+  ^-  json
+  =,  format
+  (pairs:enjs [[%yolo %b %.y] ~])
 ::
 ++  poke-handle-http-request
   |=  =inbound-request:eyre
