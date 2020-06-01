@@ -183,8 +183,15 @@
   |=  response=client-response:iris
   ^-  json
   =,  format
-  ~&  response
-  (pairs:enjs [[%yolo %b %.y] ~])
+  =/  handler  |=  jon=json
+    ?>  ?=(%o -.jon)
+    =/  root=json  (~(got by p.jon) 'root')
+    ?>  ?=(%o -.root)
+    =/  bsa=json  (~(got by p.root) 'bsa')
+    ?>  ?=(%a -.bsa)
+    ~&  -.bsa
+    (pairs:enjs [[%elevators %a p.bsa] ~])
+  (with-json-handler response handler)
 ::
 ++  poke-handle-http-request
   |=  =inbound-request:eyre
