@@ -3,6 +3,34 @@ import { BrowserRouter, Route } from "react-router-dom";
 import _ from 'lodash';
 import { HeaderBar } from "./lib/header-bar.js"
 
+class TimeScheduleWidget extends Component {
+  constructor(props) {
+    super(props)
+    this.state = { curTime: new Date() };
+  }
+
+  componentDidMount() {
+    this.timerId = setInterval(() => this.tick(), 1000);
+  }
+  componentWillUnmount() {
+    clearInterval(this.timerId);
+  }
+
+  tick() {
+    this.setState({curTime: new Date()});
+  }
+
+  render() {
+    const curTime = this.state.curTime;
+    const timeStr = curTime.toLocaleTimeString();
+    const serviceStr = curTime.getDay() === 0 ? "Sunday service" : "Weekday / Saturday service";
+    return (<div style={{textAlign: "center"}}>
+      <p className="lh-copy measure pt3">Current time: <b>{timeStr}</b></p>
+      <p className="lh-copy measure pt3">{serviceStr}</p>
+    </div>);
+  }
+}
+
 
 export class Root extends Component {
   constructor(props) {
@@ -62,8 +90,7 @@ export class Root extends Component {
               <h1 className="mt0 f8 fw4">BART Info</h1>
               <div style={{display: "grid", gridTemplateColumns: "66% 34%", gridGap: "10px" }}>
                 <div className="topinfo" style={{gridColumn: "1 / 2"}}>
-                  <p className="lh-copy measure pt3">Current time is (current time)</p>
-                  <p className="lh-copy measure pt3">Today's bart map:</p>
+                  <TimeScheduleWidget/>
                 </div>
                 <div className="map" style={{gridColumn: "1", gridRow: "2"}}>
                   <img src="/~bartinfo/img/BART-Map-Weekday-Saturday.png" />
