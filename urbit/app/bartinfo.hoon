@@ -60,6 +60,10 @@
       %+  give-simple-payload:app  eyre-id
       %+  require-authorization:app  inbound-request
       poke-handle-http-request:cc
+        %json
+      =+  !<(jon=json vase)
+      :_  this
+      (poke-handle-json:cc jon)
     ::
     ==
   ::
@@ -187,6 +191,12 @@
     (pairs:enjs [[%elevators %a p.bsa] ~])
   (with-json-handler response handler)
 ::
+++  poke-handle-json
+  |=  jon=json 
+  ^-  (list card)
+  ~&  jon
+  [~]
+::  
 ++  poke-handle-http-request
   |=  =inbound-request:eyre
   ^-  simple-payload:http
