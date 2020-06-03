@@ -12,6 +12,50 @@ function isSundaySchedule(curTime) {
   return isSunday;
 }
 
+function getOptionsFromStations(stations) {
+  return _.map(stations, (station) => {
+    const abbr = station.abbr;
+    const name = station.name;
+    return <option key={abbr} value={abbr}>{name}</option>;
+  });
+}
+
+class ScheduleWidget extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { station: "" };
+  }
+
+  static getDerivedStateFromProps(props, state) {
+    if (state.station === "" && props.stations && props.stations[0]) {
+      const abbr = props.stations[0].abbr;
+      return { station: abbr }
+    }
+    return null;
+  }
+  getSchedule(evt) {
+    console.log("Get schedule");
+    evt.preventDefault();
+  }
+
+  changeStation(evt) {
+    const value = evt.target.value;
+    this.setState({station: value});
+  }
+
+  render() {
+    const stations = this.props.stations;
+    return (<div>
+      <form name="getSchedule" onSubmit={this.getSchedule.bind(this)}>
+        <select disabled={!stations} name="stations" value={this.state.fromStation} onChange={this.changeStation.bind(this)}>
+          { getOptionsFromStations(stations) }
+        </select>
+        <input type="submit" value="Get schedule"/>
+      </form>
+    </div>);
+  }
+}
+
 class ElevatorWidget extends Component {
 
   statuses() {
@@ -99,26 +143,17 @@ class RoutePlanner extends Component {
     }
   }
 
-  renderStationOptions() {
-    const stations = this.props.stations;
-    return _.map(stations, (station) => {
-      const abbr = station.abbr;
-      const name = station.name;
-      return <option key={abbr} value={abbr}>{name}</option>;
-    });
-  }
-
   renderStationForm() {
     const receivedStations = this.props.stations;
     return (<form name="bartSearch" onSubmit={this.stationSearch.bind(this)}>
       From:
       <select disabled={!receivedStations} name="fromStation" value={this.state.fromStation} onChange={this.changeStation.bind(this)}>
-        { this.renderStationOptions() }
+        { getOptionsFromStations(receivedStations) }
       </select>
       <br/>
       To:
       <select disabled={!receivedStations} name="toStation" value={this.state.toStation} onChange={this.changeStation.bind(this)}>
-        { this.renderStationOptions() }
+        { getOptionsFromStations(receivedStations) }
       </select>
       <input type="submit" value="Search"/>
     </form>);
@@ -143,6 +178,10 @@ class RoutePlanner extends Component {
           <div className="searchsidebar" style={{gridColumn: "2", gridRow: "2"}}>
             Search scheduled trains:
             { this.renderStationForm() }
+
+            <br/>
+            or see the official bart scheduler for a given station, date and time:
+            <ScheduleWidget stations={this.props.stations}/>
           </div>
         </div>
       </div>
