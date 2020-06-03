@@ -69,13 +69,13 @@ class RoutePlanner extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      fromStation: null,
-      toStation: null,
+      fromStation: "",
+      toStation: "",
     };
   }
 
   static getDerivedStateFromProps(props, state) {
-    if (state.fromStation === null && props.stations && props.stations[0]) {
+    if (state.fromStation === "" && props.stations && props.stations[0]) {
       const abbr = props.stations[0].abbr;
       return { fromStation: abbr, toStation: abbr};
     }
@@ -109,18 +109,15 @@ class RoutePlanner extends Component {
   }
 
   renderStationForm() {
-    let initialState = null;
-    if (this.props.stations && this.props.stations[0]) {
-      initialState = this.props.stations[0].abbr;
-    }
+    const receivedStations = this.props.stations;
     return (<form name="bartSearch" onSubmit={this.stationSearch.bind(this)}>
       From:
-      <select disabled={!initialState} name="fromStation" value={this.state.fromStation || initialState} onChange={this.changeStation.bind(this)}>
+      <select disabled={!receivedStations} name="fromStation" value={this.state.fromStation} onChange={this.changeStation.bind(this)}>
         { this.renderStationOptions() }
       </select>
       <br/>
       To:
-      <select disabled={!initialState} name="toStation" value={this.state.toStation || initialState} onChange={this.changeStation.bind(this)}>
+      <select disabled={!receivedStations} name="toStation" value={this.state.toStation} onChange={this.changeStation.bind(this)}>
         { this.renderStationOptions() }
       </select>
       <input type="submit" value="Search"/>

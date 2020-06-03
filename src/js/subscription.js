@@ -20,6 +20,10 @@ export class Subscription {
        this.handleError.bind(this));
     */
 
+     api.bind("/routes", "PUT", api.authTokens.ship, "bartinfo",
+       this.handleEvent.bind(this),
+       this.handleError.bind(this));
+
      api.bind("/elevators", "PUT", api.authTokens.ship, "bartinfo",
        this.handleEvent.bind(this),
        this.handleError.bind(this));

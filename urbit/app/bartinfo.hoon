@@ -83,6 +83,8 @@
         =/  req  bart-api-elevator-status:cc
         [%pass /elevators %arvo %i %request req out]
       [~[elevator-status-request] this]
+    ?:  ?=([%routes *] path)
+      [[~] this]
     ?:  ?=([%http-response *] path)
       `this
     ?.  =(/ path)
@@ -192,11 +194,12 @@
   (with-json-handler response handler)
 ::
 ++  poke-handle-json
-  |=  jon=json 
+  |=  jon=json
   ^-  (list card)
   ~&  jon
-  [~]
-::  
+  =/  update=json  *json
+  [%give %fact ~[/routes] %json !>(update)]~
+::
 ++  poke-handle-http-request
   |=  =inbound-request:eyre
   ^-  simple-payload:http
