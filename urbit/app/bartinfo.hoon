@@ -193,10 +193,29 @@
     (pairs:enjs [[%elevators %a p.bsa] ~])
   (with-json-handler response handler)
 ::
+++  bart-api-routeplan
+  |=  [from=tape to=tape]
+  ^-  request:http
+  :: http://api.bart.gov/api/sched.aspx?cmd=depart&orig=ASHB&dest=CIVC&date=now
+  ::  TODO cmd can be 'depart' or 'arrive', also 'fare'
+  =/  url  (crip "{bart-api-url-base}/sched.aspx?cmd=depart&orig={from}&dest={to}&key={bart-api-key}&json=y")
+  ~&  url
+  =/  headers  [['Accept' 'application/json']]~
+  [%'GET' url headers *(unit octs)]
 ++  poke-handle-json
   |=  jon=json
   ^-  (list card)
   ~&  jon
+  =,  format
+  ?.  ?=(%o -.jon)
+    [~]
+  =/  omso   ((om:dejs so:dejs) jon)
+  =/  from-station=tape   (trip (~(gut by omso) 'from' ''))
+  =/  to-station=tape   (trip (~(gut by omso) 'to' ''))
+  =/  req  (bart-api-routeplan from-station to-station)
+  =/  out  *outbound-config:iris
+  =/  output  [%pass /routeplan %arvo %i %request req out]
+::
   =/  update=json  *json
   [%give %fact ~[/routes] %json !>(update)]~
 ::
