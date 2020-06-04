@@ -113,12 +113,14 @@ class RouteSearch extends Component {
   constructor(props) {
     super(props);
     const now = new Date();
+    const hours = now.getHours();
     this.state = {
       fromStation: "",
       toStation: "",
       depart: 'now',
       min: now.getMinutes(),
-      hour: now.getHours(),
+      hour: hours === 0 ? 12 : hours % 12,
+      isPM: hours >= 12
     };
   }
 
@@ -134,7 +136,11 @@ class RouteSearch extends Component {
     evt.preventDefault();
     api.action("bartinfo", "json", {
       from: this.state.fromStation,
-      to: this.state.toStation});
+      to: this.state.toStation,
+      min: this.state.min,
+      hour: this.state.hour,
+      isPM: this.state.isPM,
+    });
   }
 
   changeStation(evt) {
@@ -155,10 +161,12 @@ class RouteSearch extends Component {
   setDepartAt(evt) {
     evt.preventDefault();
     const now = new Date();
+    const hours = now.getHours();
     this.setState({
       depart: "givenTime",
-      hour: now.getHours(),
       min: now.getMinutes(),
+      hour: hours === 0 ? 12 : hours % 12,
+      isPM: hours >= 12
     });
   }
 
@@ -182,12 +190,29 @@ class RouteSearch extends Component {
         <div></div>
         <div>
         </div>
-          <select name="hour" value={this.state.hour} onChange={(evt) => this.setState({hour: evt.target.value}) } disabled={departNow}>
-            { _.map(_.range(0, 24), (hour) => { return <option key={`h-${hour}`} value={hour}>{hour}</option>;}) }
+          <select 
+            name="hour"
+            value={this.state.hour}
+            onChange={(evt) => this.setState({hour: evt.target.value}) } disabled={departNow}
+          >
+            { _.map(_.range(1, 13), (hour) => { return <option key={`h-${hour}`} value={hour}>{hour}</option>;}) }
           </select>
             <span>:</span>
-          <select name="min" value={this.state.min} onChange={(evt) => this.setState({min: evt.target.value}) } disabled={departNow}>
+          <select
+            name="min"
+            value={this.state.min}
+            onChange={(evt) => this.setState({min: evt.target.value}) } disabled={departNow}
+          >
             { _.map(_.range(0, 60), (min) => { return <option key={`m-${min}`} value={min}>{min}</option>;}) }
+          </select>
+          <select 
+            name="isPM"
+            value={this.state.isPM ? "PM" : "AM"}
+            disabled={departNow}
+            onChange={(evt) => this.setState({isPM: evt.target.value === "PM"})}
+          >
+            <option value="AM">AM</option>
+            <option value="PM">PM</option>
           </select>
       </div>
     </div>);

@@ -105,12 +105,19 @@
         ?>  ?=(%o -.value)
         =/  update=json  (pairs:enjs:format [update+o+p.value ~])
         [%give %fact ~[/bartstations] %json !>(update)]~
-::
+      ::
       [%elevators *]
       =/  value=json  (parse-elevator-status-response:cc client-response.sign-arvo)
       ?>  ?=(%o -.value)
       =/  update=json  (pairs:enjs:format [update+o+p.value ~])
       [%give %fact ~[/elevators] %json !>(update)]~
+      ::
+      [%routeplan *]
+      ~&  client-response.sign-arvo
+      =/  value=json  (parse-routeplan-response:cc client-response.sign-arvo)
+      ?>  ?=(%o -.value)
+      =/  update=json  (pairs:enjs:format [update+o+p.value ~])
+      [%give %fact ~[/routes] %json !>(update)]~
       ==
       [http-moves this]
     ?.  ?=(%bound +<.sign-arvo)
@@ -194,14 +201,20 @@
   (with-json-handler response handler)
 ::
 ++  bart-api-routeplan
-  |=  [from=tape to=tape]
+  |=  [from=tape to=tape hour=@ min=@ ispm=?]
   ^-  request:http
   :: http://api.bart.gov/api/sched.aspx?cmd=depart&orig=ASHB&dest=CIVC&date=now
   ::  TODO cmd can be 'depart' or 'arrive', also 'fare'
-  =/  url  (crip "{bart-api-url-base}/sched.aspx?cmd=depart&orig={from}&dest={to}&key={bart-api-key}&json=y")
+  =/  meridian  ?:(ispm "pm" "am")
+  =/  time  "{<hour>}:{<min>}{meridian}"
+  =/  url  (crip "{bart-api-url-base}/sched.aspx?cmd=depart&orig={from}&dest={to}&time={time}&key={bart-api-key}&json=y")
   ~&  url
   =/  headers  [['Accept' 'application/json']]~
   [%'GET' url headers *(unit octs)]
+++  parse-routeplan-response
+  |=  response=client-response:iris
+  ^-  json
+  (with-json-handler response |=(x=json x)) 
 ++  poke-handle-json
   |=  jon=json
   ^-  (list card)
@@ -209,15 +222,20 @@
   =,  format
   ?.  ?=(%o -.jon)
     [~]
-  =/  omso   ((om:dejs so:dejs) jon)
-  =/  from-station=tape   (trip (~(gut by omso) 'from' ''))
-  =/  to-station=tape   (trip (~(gut by omso) 'to' ''))
-  =/  req  (bart-api-routeplan from-station to-station)
+  =/  [hour=@ min=@ ispm=? from-station=tape to-station=tape]
+    %.
+      jon
+      %:  ot:dejs
+        ['hour' ni:dejs]
+        ['min' ni:dejs]
+        ['isPM' bo:dejs]
+        ['from' sa:dejs]
+        ['to' sa:dejs]
+        ~
+      ==
+  =/  req  (bart-api-routeplan from-station to-station hour min ispm)
   =/  out  *outbound-config:iris
-  =/  output  [%pass /routeplan %arvo %i %request req out]
-::
-  =/  update=json  *json
-  [%give %fact ~[/routes] %json !>(update)]~
+  [[%pass /routeplan %arvo %i %request req out] ~]
 ::
 ++  poke-handle-http-request
   |=  =inbound-request:eyre
