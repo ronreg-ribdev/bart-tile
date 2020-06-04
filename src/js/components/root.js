@@ -109,19 +109,23 @@ class TimeScheduleWidget extends Component {
   }
 }
 
-class RoutePlanner extends Component {
+class RouteSearch extends Component {
   constructor(props) {
     super(props);
+    const now = new Date();
     this.state = {
       fromStation: "",
       toStation: "",
+      depart: 'now',
+      min: now.getMinutes(),
+      hour: now.getHours(),
     };
   }
 
   static getDerivedStateFromProps(props, state) {
     if (state.fromStation === "" && props.stations && props.stations[0]) {
       const abbr = props.stations[0].abbr;
-      return { fromStation: abbr, toStation: abbr};
+      return { ...state, fromStation: abbr, toStation: abbr};
     }
     return null;
   }
@@ -143,7 +147,53 @@ class RoutePlanner extends Component {
     }
   }
 
-  renderStationForm() {
+  setDepartNow(evt) {
+    evt.preventDefault();
+    this.setState({depart: "now"});
+  }
+
+  setDepartAt(evt) {
+    evt.preventDefault();
+    const now = new Date();
+    this.setState({
+      depart: "givenTime",
+      hour: now.getHours(),
+      min: now.getMinutes(),
+    });
+  }
+
+  renderTimePicker() {
+    const state = this.state;
+    const departNow = this.state.depart === 'now';
+    return (<div style={{display: "flex"}}>
+      <div> 
+        <a href="" onClick={ this.setDepartNow.bind(this) }>
+          <div>
+            <p>{ departNow ? <b>Now</b> : "Now" }</p>
+          </div>
+        </a>
+        <a href="" onClick={ this.setDepartAt.bind(this)}>
+          <div>
+            <p>{ departNow ? "At..." : <b>At...</b>}</p>
+          </div>
+        </a>
+      </div>
+      <div>
+        <div></div>
+        <div>
+        </div>
+          <select name="hour" value={this.state.hour} onChange={(evt) => this.setState({hour: evt.target.value}) } disabled={departNow}>
+            { _.map(_.range(0, 24), (hour) => { return <option key={`h-${hour}`} value={hour}>{hour}</option>;}) }
+          </select>
+            <span>:</span>
+          <select name="min" value={this.state.min} onChange={(evt) => this.setState({min: evt.target.value}) } disabled={departNow}>
+            { _.map(_.range(0, 60), (min) => { return <option key={`m-${min}`} value={min}>{min}</option>;}) }
+          </select>
+      </div>
+    </div>);
+  }
+
+  render() {
     const receivedStations = this.props.stations;
     return (<form name="bartSearch" onSubmit={this.stationSearch.bind(this)}>
       From:
@@ -155,9 +205,17 @@ class RoutePlanner extends Component {
       <select disabled={!receivedStations} name="toStation" value={this.state.toStation} onChange={this.changeStation.bind(this)}>
         { getOptionsFromStations(receivedStations) }
       </select>
+      <div>
+        Depart at:
+        { this.renderTimePicker() }
+      </div>
       <input type="submit" value="Search"/>
     </form>);
   }
+}
+
+class RoutePlanner extends Component {
+
 
   render() {
     const curTime = this.props.curTime;
@@ -177,8 +235,7 @@ class RoutePlanner extends Component {
           </div>
           <div className="searchsidebar" style={{gridColumn: "2", gridRow: "2"}}>
             Search scheduled trains:
-            { this.renderStationForm() }
-
+            <RouteSearch stations={this.props.stations} curTime={curTime} />
             <br/>
             or see the official bart scheduler for a given station, date and time:
             <ScheduleWidget stations={this.props.stations}/>
