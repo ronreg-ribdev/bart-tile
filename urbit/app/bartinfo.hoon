@@ -160,23 +160,15 @@
   |=  response=client-response:iris
   ^-  json
   =,  format
-  =/  handler  |=  parsed-json=json
-    ?>  ?=(%o -.parsed-json)
-    =/  root=json  (~(got by p.parsed-json) 'root')
-    ?>  ?=(%o -.root)
-    =/  stations  (~(got by p.root) 'stations')
-    ?>  ?=(%o -.stations)
-    =/  station=json  (~(got by p.stations) 'station')
-    ?>  ?=(%a -.station)
-    =/  inner  p.station
-    =/  abbr-and-name   %-  turn  :-  inner  |=  item=json
+  =/  handler  |=  jon=json
+    =/  root       ((ot:dejs ~[['root' same]]) jon)
+    =/  stations   ((ot:dejs ~[['stations' same]]) root)
+    =/  station    ((ot:dejs ~[['station' (ar:dejs same)]]) stations)
+    =/  abbr-and-name   %-  turn  :-  station  |=  item=json
       ^-  json
-      ?>  ?=(%o -.item)
-      =/  name  (~(got by p.item) 'name')
-      ?>  ?=(%s -.name)
-      =/  abbr  (~(got by p.item) 'abbr')
-      ?>  ?=(%s -.abbr)
-      (pairs:enjs [name+s+p.name abbr+s+p.abbr ~])
+      =/  [name=tape abbr=tape]  
+            ((ot:dejs ~[['name' sa:dejs] ['abbr' sa:dejs]]) item)
+      (pairs:enjs ~[name+(tape:enjs name) abbr+(tape:enjs abbr)])
     (pairs:enjs [[%stations %a abbr-and-name] ~])
   (with-json-handler response handler)
 ::
@@ -190,10 +182,8 @@
   ^-  json
   =,  format
   =/  handler  |=  jon=json
-    ?>  ?=(%o -.jon)
-    =/  root=json  (~(got by p.jon) 'root')
-    ?>  ?=(%o -.root)
-    =/  bsa=json  (~(got by p.root) 'bsa')
+    =/  root=json  ((ot:dejs ~[['root' same]]) jon)
+    =/  bsa=json   ((ot:dejs ~[['bsa' same]]) root)
     ?>  ?=(%a -.bsa)
     ~&  -.bsa
     (pairs:enjs [[%elevators %a p.bsa] ~])
@@ -207,7 +197,7 @@
   =/  meridian  ?:(ispm "pm" "am")
   =/  time  "{<hour>}:{<min>}{meridian}"
   =/  url  (crip "{bart-api-url-base}/sched.aspx?cmd=depart&orig={from}&dest={to}&time={time}&key={bart-api-key}&json=y")
-  ~&  url
+  ~&  "Making BART API request to {<url>}"
   =/  headers  [['Accept' 'application/json']]~
   [%'GET' url headers *(unit octs)]
 ++  parse-routeplan-response
@@ -216,7 +206,6 @@
   =,  format
   =/  handler
     |=  jon=json
-    ~&  jon
     =/  root=json  ((ot:dejs [['root' same] ~]) jon)
     root
   (with-json-handler response handler)
