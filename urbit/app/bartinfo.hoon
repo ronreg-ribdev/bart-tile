@@ -188,13 +188,17 @@
   (with-json-handler response handler)
 ::
 ++  bart-api-routeplan
+::  Documentation: http://api.bart.gov/docs/sched/depart.aspx
   |=  [from=tape to=tape hour=@ min=@ ispm=?]
   ^-  request:http
-  :: http://api.bart.gov/api/sched.aspx?cmd=depart&orig=ASHB&dest=CIVC&date=now
-  ::  TODO cmd can be 'depart' or 'arrive', also 'fare'
   =/  meridian  ?:(ispm "pm" "am")
-  =/  time  "{<hour>}:{<min>}{meridian}"
-  =/  url  (crip "{bart-api-url-base}/sched.aspx?cmd=depart&orig={from}&dest={to}&time={time}&key={bart-api-key}&json=y")
+  =/  minstr  ?:  =(min 0)   "00"
+              ?:  (lte min 9)  "0{<min>}"
+              "{<min>}"
+  =/  time  "{<hour>}:{minstr}{meridian}"
+  =/  before  1
+  =/  after   3
+  =/  url  (crip "{bart-api-url-base}/sched.aspx?cmd=depart&orig={from}&a={<after>}&b={<before>}&dest={to}&time={time}&key={bart-api-key}&json=y")
   ~&  "Making BART API request to {<url>}"
   =/  headers  [['Accept' 'application/json']]~
   [%'GET' url headers *(unit octs)]

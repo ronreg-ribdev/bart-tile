@@ -45,6 +45,7 @@ class ScheduleWidget extends Component {
   }
   getSchedule(evt) {
     console.log("Get schedule");
+    // Needs to make a request at https://www.bart.gov/schedules/bystationresults?station=12TH&date=06/03/2020&time=6%3A30%20PM
     evt.preventDefault();
   }
 
@@ -251,15 +252,46 @@ class RouteSearch extends Component {
   }
 }
 
+class IndividualRouteResult extends Component {
+  render() {
+    const trip = this.props.trip;
+    return (<div>
+      Depart: {trip.depart} Arrive: {trip.arrive} ({trip.time})
+      <br/>
+      Cost: {trip.fare}
+      <br/>
+      Legs:
+      { _.map(trip.legs, (leg) => `${leg.line} line`) }
+    </div>);
+  }
+}
+
 class RouteResults extends Component {
   render() {
+    const routes = this.props.routes;
     console.log(this.props.routes);
-    if (!this.props.routes) {
+    if (!routes) {
       return (<div></div>);
     }
 
+    const request = routes.request;
+    const trip = request.trip;
+    const trips = _.map(trip, (t) => {
+      return {
+        fare: t['@fare'],
+        depart: t['@origTimeMin'],
+        arrive: t['@destTimeMin'],
+        time: t['@tripTime'],
+        legs: _.map(t.leg, (leg) => {
+          return {line: leg['@trainHeadStation'] };
+        })
+      };
+    });
+
     return (<div>
       Trains:
+      <br/>
+      { _.map(trips, (trip, idx) => <IndividualRouteResult key={idx} trip={trip} />) }
     </div>);
   }
 }
