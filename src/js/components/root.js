@@ -34,6 +34,8 @@ class ScheduleWidget extends Component {
   constructor(props) {
     super(props);
     this.state = { station: "" };
+
+
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -44,8 +46,18 @@ class ScheduleWidget extends Component {
     return null;
   }
   getSchedule(evt) {
-    console.log("Get schedule");
     // Needs to make a request at https://www.bart.gov/schedules/bystationresults?station=12TH&date=06/03/2020&time=6%3A30%20PM
+    const station = this.state.station;
+    const t = new Date();
+    const date = `${t.getMonth()}/${t.getDay()}/${t.getYear()}`
+
+    const hours = t.getHours();
+    const h = hours === 0 ? 12 : hours % 12;
+    const m = padNumber(t.getMinutes());
+    const meridian = hours >= 12 ? "PM": "AM"
+    const timeStr = `${h}:${m} ${meridian}`;
+    const url = `https://www.bart.gov/schedules/bystationresults?station=${station}&date=${date}&time=${timeStr}`;
+    window.open(url, '_blank');
     evt.preventDefault();
   }
 
