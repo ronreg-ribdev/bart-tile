@@ -14,6 +14,11 @@ export class UpdateReducer {
             if (elevators) {
                 state.elevators = elevators;
             }
+
+            const routes = _.get(data, "routes", false);
+            if (routes) {
+                state.routes = routes;
+            }
         }
     }
 }

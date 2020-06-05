@@ -251,9 +251,20 @@ class RouteSearch extends Component {
   }
 }
 
+class RouteResults extends Component {
+  render() {
+    console.log(this.props.routes);
+    if (!this.props.routes) {
+      return (<div></div>);
+    }
+
+    return (<div>
+      Trains:
+    </div>);
+  }
+}
+
 class RoutePlanner extends Component {
-
-
   render() {
     const curTime = this.props.curTime;
     const mapFilename = isSundaySchedule(curTime) ? "BART-Map-Sunday.png" : "BART-Map-Weekday-Saturday.png";
@@ -274,6 +285,7 @@ class RoutePlanner extends Component {
             Search scheduled trains:
             <RouteSearch stations={this.props.stations} curTime={curTime} />
             <br/>
+            <RouteResults routes={this.props.routes} />
             or see the official bart scheduler for a given station, date and time:
             <ScheduleWidget stations={this.props.stations}/>
           </div>
@@ -306,6 +318,7 @@ export class Root extends Component {
             <RoutePlanner
               curTime={new Date() }
               stations={this.state.stations || []}
+              routes={this.state.routes}
             /> } />
         </div>
       </BrowserRouter>
