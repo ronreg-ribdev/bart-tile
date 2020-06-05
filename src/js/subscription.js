@@ -14,12 +14,6 @@ export class Subscription {
   }
 
    initializebartinfo() {
-    /*
-     api.bind('/primary', 'PUT', api.authTokens.ship, 'bartinfo',
-       this.handleEvent.bind(this),
-       this.handleError.bind(this));
-    */
-
      api.bind("/routes", "PUT", api.authTokens.ship, "bartinfo",
        this.handleEvent.bind(this),
        this.handleError.bind(this));

@@ -193,7 +193,7 @@ class RouteSearch extends Component {
           <select 
             name="hour"
             value={this.state.hour}
-            onChange={(evt) => this.setState({hour: evt.target.value}) } disabled={departNow}
+            onChange={(evt) => this.setState({hour: parseInt(evt.target.value)}) } disabled={departNow}
           >
             { _.map(_.range(1, 13), (hour) => { return <option key={`h-${hour}`} value={hour}>{hour}</option>;}) }
           </select>
@@ -201,7 +201,7 @@ class RouteSearch extends Component {
           <select
             name="min"
             value={this.state.min}
-            onChange={(evt) => this.setState({min: evt.target.value}) } disabled={departNow}
+            onChange={(evt) => this.setState({min: parseInt(evt.target.value)}) } disabled={departNow}
           >
             { _.map(_.range(0, 60), (min) => { return <option key={`m-${min}`} value={min}>{min}</option>;}) }
           </select>
