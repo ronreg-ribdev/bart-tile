@@ -3,6 +3,16 @@ import { BrowserRouter, Route, Link } from "react-router-dom";
 import _ from 'lodash';
 import { HeaderBar } from "./lib/header-bar.js"
 
+function padNumber(number) {
+  if (number == 0) {
+    return "00";
+  }
+  if (number <= 9) {
+    return `0${number}`
+  }
+  return number.toString();
+}
+
 function isSundaySchedule(curTime) {
   // Deliberately switch over the effective day in the middle of the
   // night.
@@ -195,7 +205,7 @@ class RouteSearch extends Component {
             value={this.state.hour}
             onChange={(evt) => this.setState({hour: parseInt(evt.target.value)}) } disabled={departNow}
           >
-            { _.map(_.range(1, 13), (hour) => { return <option key={`h-${hour}`} value={hour}>{hour}</option>;}) }
+            { _.map(_.range(1, 13), (hour) => { return <option key={`h-${hour}`} value={hour}>{padNumber(hour)}</option>;}) }
           </select>
             <span>:</span>
           <select
@@ -203,7 +213,7 @@ class RouteSearch extends Component {
             value={this.state.min}
             onChange={(evt) => this.setState({min: parseInt(evt.target.value)}) } disabled={departNow}
           >
-            { _.map(_.range(0, 60), (min) => { return <option key={`m-${min}`} value={min}>{min}</option>;}) }
+            { _.map(_.range(0, 60), (min) => { return <option key={`m-${min}`} value={min}>{padNumber(min)}</option>;}) }
           </select>
           <select 
             name="isPM"
@@ -234,7 +244,9 @@ class RouteSearch extends Component {
         Depart at:
         { this.renderTimePicker() }
       </div>
-      <input type="submit" value="Search"/>
+      <div style={{padding: '5px'}}>
+        <input type="submit" value="Search"/>
+      </div>
     </form>);
   }
 }

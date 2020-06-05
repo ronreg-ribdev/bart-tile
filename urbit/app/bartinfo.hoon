@@ -113,7 +113,6 @@
       [%give %fact ~[/elevators] %json !>(update)]~
       ::
       [%routeplan *]
-      ~&  client-response.sign-arvo
       =/  value=json  (parse-routeplan-response:cc client-response.sign-arvo)
       ?>  ?=(%o -.value)
       =/  update=json  (pairs:enjs:format [update+o+p.value ~])
@@ -214,7 +213,13 @@
 ++  parse-routeplan-response
   |=  response=client-response:iris
   ^-  json
-  (with-json-handler response |=(x=json x)) 
+  =,  format
+  =/  handler
+    |=  jon=json
+    ~&  jon
+    =/  root=json  ((ot:dejs [['root' same] ~]) jon)
+    root
+  (with-json-handler response handler)
 ++  poke-handle-json
   |=  jon=json
   ^-  (list card)
