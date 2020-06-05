@@ -183,10 +183,8 @@
   =,  format
   =/  handler  |=  jon=json
     =/  root=json  ((ot:dejs ~[['root' same]]) jon)
-    =/  bsa=json   ((ot:dejs ~[['bsa' same]]) root)
-    ?>  ?=(%a -.bsa)
-    ~&  -.bsa
-    (pairs:enjs [[%elevators %a p.bsa] ~])
+    =/  bsa=(list json)   ((ot:dejs ~[['bsa' (ar:dejs same)]]) root)
+    (pairs:enjs [[%elevators %a bsa] ~])
   (with-json-handler response handler)
 ::
 ++  bart-api-routeplan
@@ -207,7 +205,8 @@
   =/  handler
     |=  jon=json
     =/  root=json  ((ot:dejs [['root' same] ~]) jon)
-    root
+    =/  schedule=json  ((ot:dejs [['schedule' same] ~]) root)
+    (pairs:enjs ~[[%routes schedule]])
   (with-json-handler response handler)
 ++  poke-handle-json
   |=  jon=json
