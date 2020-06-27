@@ -311,7 +311,7 @@ class RouteResults extends Component {
 class RoutePlanner extends Component {
   render() {
     const curTime = this.props.curTime;
-    const mapFilename = isSundaySchedule(curTime) ? "BART-Map-Sunday.png" : "BART-Map-Weekday-Saturday.png";
+    const mapFilename = "BART-system-map.png";
     const mapPath=`/~bartinfo/img/${mapFilename}`;
 
     return (
